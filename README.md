@@ -98,9 +98,45 @@ Claude Code 재시작 후 자동 인식.
 
 Claude가 `_index/topics.md`와 통합본들을 읽어 답변 + 인용 제공.
 
-## 백업
+## 여러 PC에서 동기화 (GitHub 사용)
 
-`~/work-log/` 폴더 전체를 드롭박스/원드라이브/git에 넣으면 자동 백업·동기화.
+`~/work-log/` 폴더 전체를 **private GitHub 레포로 관리**하면 사무실·집·노트북에서 같은 기록을 공유할 수 있습니다. 별도 스킬·도구 불필요 — Claude한테 자연어로 시키면 됩니다.
+
+### 최초 셋업 (한 번만)
+
+첫 `/work_done` 호출로 `~/work-log/`가 생성된 뒤, Claude한테:
+
+> "내 ~/work-log 폴더를 private GitHub 레포(이름: work-log)로 푸시해줘"
+
+→ Claude가 `gh repo create` + `git init` + `git push` 모두 처리.
+
+### 다른 PC에서 시작할 때
+
+> "https://github.com/<유저명>/work-log.git 클론해서 ~/work-log 에 둬"
+
+또는 직접:
+```powershell
+git clone https://github.com/<유저명>/work-log.git "$env:USERPROFILE\work-log"
+```
+
+### 작업 끝나고 동기화
+
+```
+/work_done × N         (세션 작업)
+/day_merge             (통합)
+```
+그리고 Claude한테:
+> "오늘 작업 git에 커밋 푸시해줘"
+
+### 주의사항
+
+- ⚠️ **반드시 Private 레포** — 업무 내용이 들어가니까
+- ⚠️ **회사 데이터 정책 확인** — 개인 GitHub에 업무 기록 올리는 게 금지일 수 있음
+- 두 PC에서 동시에 push하면 한 쪽이 거부됨 → pull 먼저 받고 다시 push (Claude한테 시키면 됨)
+
+## 단순 백업만 원할 때
+
+GitHub 동기화가 부담스럽다면 폴더를 OneDrive/Dropbox/iCloud 폴더 안에 두는 것만으로도 자동 백업·동기화 가능 (`~/.claude/work-log.config.json`에서 경로 변경).
 
 ## 파일
 

@@ -245,10 +245,19 @@ projects: [프로젝트1]
 
 Claude가 `_index/topics.md`와 통합본들을 읽어 답합니다.
 
-## 백업
+## 여러 PC에서 사용 / 백업
 
-이 폴더 전체를 드롭박스/원드라이브/git 등에 넣으면 자동 백업됩니다.
-여러 PC에서 쓰려면 클라우드 동기화 폴더 안에 두는 것을 추천.
+이 폴더 전체를 private GitHub 레포로 관리하면 사무실·집 등 여러 PC에서 같은 기록을 공유할 수 있습니다. 별도 도구·스킬 불필요 — Claude한테 자연어로 시키면 됩니다.
+
+**최초 셋업 (한 번):** Claude한테 "이 ~/work-log 폴더를 private GitHub 레포로 푸시해줘"
+
+**다른 PC 시작:** "그 레포 ~/work-log에 클론해줘"
+
+**작업 끝:** /day_merge 후 "git 커밋 푸시해줘"
+
+GitHub이 부담스러우면 OneDrive/Dropbox 폴더 안에 두는 것도 동일하게 동작 (경로는 `~/.claude/work-log.config.json`에서 변경).
+
+⚠️ 어느 방식이든 회사 데이터 정책 먼저 확인.
 ```
 
 ---
