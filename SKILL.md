@@ -192,7 +192,7 @@ projects: [프로젝트1]
 ```
 ✓ 세션 파일 저장: _sessions/YYYY-MM-DD__<ID>_HHMM.md
 
-📊 오늘 _sessions/에 N개 세션 누적 중. 통합하려면 /day_merge.
+📊 오늘 _sessions/에 N개 세션 누적 중.
 ```
 
 `N`은 `Glob`으로 `<work-log>/_sessions/YYYY-MM-DD__*.md` 개수.
@@ -201,11 +201,41 @@ projects: [프로젝트1]
 
 ---
 
-## 토픽 인덱스는?
+## 7단계: 인덱스 자동 갱신 (선택)
 
-`/work_done`은 인덱스를 갱신하지 않는다. 인덱스 갱신은 `/day_merge`가 통합본을 만들 때 수행한다. 이렇게 분리하는 이유:
-- 인덱스는 통합본(`YYYY-MM-DD.md`) 기반이어야 깔끔 (pending 세션이 섞이면 노이즈)
-- `/work_done`은 가볍게 유지 (인덱스 재생성 비용 X)
+> ℹ️ 이 단계는 자매 스킬 [`rebuild-index`](https://github.com/tinky1244-rgb/claude-skill-rebuild-index)가 설치된 경우에만 동작한다. 미설치 시 조용히 스킵 — 에러를 발생시키지 않는다.
+> `/day_merge` 통합 흐름을 선호하면 본 단계를 통째로 삭제해도 무방.
+
+6단계 보고가 끝난 직후, `rebuild-index` 스킬을 자동으로 호출해 `_index/topics.md`를 최신 상태로 갱신한다.
+
+```
+Skill 도구 호출:
+  skill: rebuild-index
+  args: (없음 — 전체 재생성)
+```
+
+호출 트리거:
+- 기본: 5단계 Write 성공 → 6단계 출력 → 7단계 자동 호출
+- 사용자가 `/work_done --no-index`로 호출한 경우 → 7단계 스킵
+- `rebuild-index` 스킬 미설치 → 7단계 조용히 스킵 (Skill 도구 호출 실패를 silent fallback)
+- 5단계 실패(파일 작성 안 됨) → 7단계 스킵
+
+rebuild-index의 리포트는 6단계 출력 뒤에 이어서 사용자에게 표시된다. 두 리포트가 하나의 응답으로 합쳐지는 형태.
+
+이렇게 분리하는 이유:
+- work_done은 가볍게 유지 — 한 번에 한 파일만 책임
+- 인덱스 통합은 멱등하게 따로 — 언제든 안전하게 재실행 가능
+- rebuild-index의 자가치유(`tags.md` 변경의 소급 적용) 효과를 매 호출마다 누리기
+
+---
+
+## 토픽 인덱스 작성권
+
+`/work_done`은 `_index/topics.md`를 **직접 손대지 않는다**. 갱신은 7단계에서 호출하는 `rebuild-index` 스킬의 단독 책임. 본 스킬은:
+- `_sessions/<신규>.md` 생성 (5단계)
+- `_index/tags.md` 갱신 (3.5단계 — 신규 태그/동의어 추가)
+
+까지만 담당한다.
 
 ---
 
