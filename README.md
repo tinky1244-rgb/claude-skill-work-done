@@ -26,9 +26,18 @@ Claude Code 세션의 작업을 **세션 단위 마크다운 파일**로 자동 
 - **Windows:** `C:\Users\<유저명>\.claude\skills\work-done\`
 - **macOS/Linux:** `~/.claude/skills/work-done/`
 
-자매 스킬 `day-merge`도 같이 설치 권장:
+### 자매 스킬 (둘 중 하나 또는 둘 다)
+
+워크플로우 한 쪽만 골라 설치하거나, 둘 다 설치해서 상황별로 골라써도 됨:
+
+**`day-merge`** — 하루 끝에 통합본 1개로 합치는 흐름
 - 레포: <https://github.com/tinky1244-rgb/claude-skill-day-merge>
 - 위치: `~/.claude/skills/day-merge/`
+
+**`rebuild-index`** — 통합 안 하고 세션 파일을 atomic으로 영구 유지, 토픽 인덱스만 멱등 재생성 (자가치유)
+- 레포: <https://github.com/tinky1244-rgb/claude-skill-rebuild-index>
+- 위치: `~/.claude/skills/rebuild-index/`
+- 본 SKILL.md 7단계가 `/work_done` 끝마다 이걸 자동 호출하게 작성돼 있음. 미설치 시 조용히 스킵.
 
 Claude Code 재시작 후 자동 인식.
 
@@ -79,6 +88,10 @@ Claude Code 재시작 후 자동 인식.
 
 ## 추천 흐름
 
+자매 스킬 어느 쪽을 쓰느냐에 따라 두 가지 흐름.
+
+### A. day-merge 흐름 (통합본 만들기)
+
 ```
 세션 작업 끝       → /work_done
 다른 세션 작업 끝  → /work_done
@@ -86,7 +99,20 @@ Claude Code 재시작 후 자동 인식.
 하루 마무리        → /day_merge
 ```
 
-여러 환경·여러 PC에서 작업해도 모든 /work_done 호출이 충돌 없이 자기 세션 파일을 만들고, /day_merge 한 번이 모두 통합.
+모든 /work_done 호출이 충돌 없이 자기 세션 파일을 만들고, /day_merge 한 번이 모두 통합. 통합본(`YYYY-MM-DD.md`) 기반 회수에 적합.
+
+### B. atomic 흐름 (rebuild-index, 통합 안 함)
+
+```
+세션 작업 끝       → /work_done   (7단계가 rebuild-index 자동 호출)
+다른 세션 작업 끝  → /work_done
+                       ⋮
+(별도 마무리 단계 없음)
+```
+
+세션 파일이 영원히 atomic 유지, `_index/topics.md`만 매번 멱등 재생성. grep 친화 / 환각 위험 낮음 / `tags.md`에 동의어 추가 시 옛 세션도 자동 정정.
+
+둘 다 설치해두고 그날 기분에 따라 골라써도 무방 — 두 스킬은 서로 충돌하지 않음.
 
 ## 회수하기
 
@@ -142,7 +168,7 @@ GitHub 동기화가 부담스럽다면 폴더를 OneDrive/Dropbox/iCloud 폴더 
 
 | 파일 | 역할 |
 |---|---|
-| `SKILL.md` | 트리거·6단계 워크플로우 (Claude가 읽음) |
+| `SKILL.md` | 트리거·7단계 워크플로우 (Claude가 읽음. 7단계는 rebuild-index 연동용 선택 단계) |
 | `references/format.md` | 세션 파일·통합본·태그 사전 상세 템플릿 |
 | `references/tags-seed.md` | 첫 실행 시 `_index/tags.md`에 복사할 시드 |
 | `README.md` | 이 파일 |
